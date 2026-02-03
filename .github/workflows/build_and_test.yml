@@ -1,4 +1,4 @@
-name: Build and Test HouseRentingApp
+name: Run SeleniumIDE APP
 
 on:
   push:
@@ -22,5 +22,9 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+    - name: Run Project 1 UI tests
+      run: dotnet test TestProject1 --no-build --verbosity normal
+    - name: Run Project 2 UI tests
+      run: dotnet test TestProject2 --no-build --verbosity normal
+    - name: Run Project 3 UI tests
+      run: dotnet test TestProject3 --no-build --verbosity normal
