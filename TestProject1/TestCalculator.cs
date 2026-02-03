@@ -1,7 +1,7 @@
+using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using NUnit.Framework;
 using System;
 
 namespace TestProject1
@@ -9,24 +9,28 @@ namespace TestProject1
     [TestFixture]
     public class TestCalculator
     {
-        IWebDriver driver;
-        ChromeOptions options;
-        IWebElement textBoxFirstNum;
-        IWebElement textBoxSecondNum;
-        IWebElement dropDownOperation;
-        IWebElement calcBtn;
-        IWebElement resetBtn;
-        IWebElement divResult;
+        private IWebDriver driver;
+
+        private IWebElement textBoxFirstNum;
+        private IWebElement textBoxSecondNum;
+        private IWebElement dropDownOperation;
+        private IWebElement calcBtn;
+        private IWebElement resetBtn;
+        private IWebElement divResult;
 
         [OneTimeSetUp]
         public void SetUp()
-        {   
+        {
+            var options = new ChromeOptions();
+            options.AddArgument("--headless=new");
+            options.AddArgument("--no-sandbox");
+            options.AddArgument("--disable-dev-shm-usage");
+            options.AddArgument("--disable-gpu");
+            options.AddArgument("--window-size=1920,1080");
 
-            options = new ChromeOptions();
-            options.AddArguments("--headless");
-            driver = new ChromeDriver();
+            driver = new ChromeDriver(options);
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
-            driver.Url = "https://calculatorhtml.onrender.com/";
+            driver.Navigate().GoToUrl("https://calculatorhtml.onrender.com/");
 
             textBoxFirstNum = driver.FindElement(By.Id("number1"));
             dropDownOperation = driver.FindElement(By.Id("operation"));
@@ -39,46 +43,34 @@ namespace TestProject1
         [OneTimeTearDown]
         public void TearDown()
         {
-            driver.Quit();
+            driver?.Quit();
+            driver?.Dispose();
         }
 
-        public void PerformCalculation(string firstNumber, string operation,
-                                        string secondNumber, string expectedResult)
+        private void PerformCalculation(string firstNumber, string operation, string secondNumber, string expectedResult)
         {
-            // Click the [Reset] button
             resetBtn.Click();
 
-            // Send values to the corresponding fields if they are not empty
             if (!string.IsNullOrEmpty(firstNumber))
-            {
                 textBoxFirstNum.SendKeys(firstNumber);
-            }
 
             if (!string.IsNullOrEmpty(secondNumber))
-            {
                 textBoxSecondNum.SendKeys(secondNumber);
-            }
 
             if (!string.IsNullOrEmpty(operation))
-            {
                 new SelectElement(dropDownOperation).SelectByText(operation);
-            }
 
-            // Click the [Calculate] button
             calcBtn.Click();
 
-            // Assert the expected and actual result text are equal
             Assert.That(divResult.Text, Is.EqualTo(expectedResult));
         }
 
-        [Test]
         [TestCase("5", "+ (sum)", "10", "Result: 15")]
         [TestCase("3.5", "- (subtract)", "1.2", "Result: 2.3")]
         [TestCase("2e2", "* (multiply)", "1.5", "Result: 300")]
         [TestCase("5", "/ (divide)", "0", "Result: Infinity")]
         [TestCase("invalid", "+ (sum)", "10", "Result: invalid input")]
-        public void TestNumberCalculator(string firstNumber, string operation,
-                                            string secondNumber, string expectedResult)
+        public void TestNumberCalculator(string firstNumber, string operation, string secondNumber, string expectedResult)
         {
             PerformCalculation(firstNumber, operation, secondNumber, expectedResult);
         }
