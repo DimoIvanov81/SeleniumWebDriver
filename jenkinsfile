@@ -13,12 +13,27 @@ pipeline {
             }
         }
 
-
-        stage('Run the tests'){
-            steps{
-                bat 'dotnet test'
+        stage('Run parallel tests'){
+            parallel {
+                stage('Project1 tests') {
+                    steps {
+                        bat 'dotnet test TestProject1 --no-build --verbosity normal'
+                    }
+                }
+                 stage('Project2 tests') {
+                    steps {
+                        bat 'dotnet test TestProject2 --no-build --verbosity normal'
+                    }
+                }
+                 stage('Project3 tests') {
+                    steps {
+                        bat 'dotnet test TestProject3 --no-build --verbosity normal'
+                    }
+                }
             }
         }
+
+
     }
 
     post {
