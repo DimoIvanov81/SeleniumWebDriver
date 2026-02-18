@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout the repository') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build the project') {
+            steps {
+                bat 'dotnet build'
+            }
+        }
+
+
+        stage('Run the tests'){
+            steps{
+                bat 'dotnet test'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipline completed'
+        }
+        success {
+            echo 'Build succedded'
+        }
+        failure {
+            echo 'Build failed'
+        }
+    }
+}
